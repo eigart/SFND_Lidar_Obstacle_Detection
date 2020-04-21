@@ -86,10 +86,10 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     //Segment largest planar component from input cloud
     seg.setInputCloud(cloud);
     seg.segment( *inliers, *coefficients);
+
     if (inliers->indices.size() == 0)
     {
         std::cout << "Could not estimate planar model for given dataset." << std::endl;
-
     }
 
 
