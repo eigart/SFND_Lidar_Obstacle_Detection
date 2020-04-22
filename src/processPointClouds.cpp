@@ -120,7 +120,7 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
     ec.setSearchMethod(tree);
     ec.setInputCloud(cloud);
     ec.extract(clusterIndices);
-
+    
     for (std::vector<pcl::PointIndices>::const_iterator it = clusterIndices.begin(); it != clusterIndices.end(); ++it)
         {
             typename pcl::PointCloud<PointT>::Ptr cluster (new pcl::PointCloud<PointT>);
