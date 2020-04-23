@@ -12,6 +12,8 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/common/transforms.h>
+#include <pcl/common/centroid.h>
+#include <pcl/filters/project_inliers.h>
 #include <iostream> 
 #include <string>  
 #include <vector>
@@ -39,6 +41,7 @@ public:
     std::vector<typename pcl::PointCloud<PointT>::Ptr> Clustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
 
     Box BoundingBox(typename pcl::PointCloud<PointT>::Ptr cluster);
+    BoxQ BoundingBoxQ(typename pcl::PointCloud<pcl::PointXYZ>::Ptr cluster);
 
     void savePcd(typename pcl::PointCloud<PointT>::Ptr cloud, std::string file);
 

@@ -12,7 +12,7 @@ struct BoxQ
 };
 struct Box
 {
-	float x_min;
+	float x_min;		
 	float y_min;
 	float z_min;
 	float x_max;

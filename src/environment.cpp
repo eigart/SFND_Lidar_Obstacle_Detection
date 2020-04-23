@@ -58,7 +58,7 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // renderPointCloud(viewer, segResult.first, "obstacles", Color(1,0,0));
     // renderPointCloud(viewer, segResult.second, "plane", Color(0,1,0));
 
-    std::vector<typename pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pclProc->Clustering(segResult.first, 0.7, 2, 30);
+    std::vector<typename pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pclProc->Clustering(segResult.first, 1.0, 3, 30);
 
     int clusterId = 0;
     std::vector<Color> colors = {Color(1,0,0), Color(0,1,0), Color(0,0,1)};
@@ -67,12 +67,18 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     {
         std::cout << "cluster size:";
         pclProc->numPoints(cluster);
-        renderPointCloud(viewer, cluster, "obstCloud"+std::to_string(clusterId), colors[clusterId % (int)colors.size()]);// % (int)colors.size()]);
+        renderPointCloud(viewer, cluster, "obstCloud"+std::to_string(clusterId), colors[clusterId % (int)colors.size()]);
+        BoxQ box = pclProc->BoundingBoxQ(cluster);
+        renderBox(viewer, box, clusterId, Color(1,0,0), 1.0);
         ++clusterId;
     }
 }
 
 
+void renderBox(pcl::visualization::PCLVisualizer::Ptr& viewer, Box b, uint clusterID)
+{
+    viewer->addCube(b.x_min, b.x_max, b.y_min, b.y_max, b.z_min, b.z_max, .2, .2, .2, "bBox");
+}
 //setAngle: SWITCH CAMERA ANGLE {XY, TopDown, Side, FPS}
 void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
