@@ -27,15 +27,51 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
 
+    
     // TODO:: Fill in the function to do voxel grid point reduction and region based filtering
+    
+    typename pcl::PointCloud<PointT>::Ptr cloud_voxels (new pcl::PointCloud<PointT>);
+    
+    pcl::VoxelGrid<PointT> vox;
+    vox.setInputCloud(cloud);
+    vox.setLeafSize(filterRes, filterRes, filterRes);
+    vox.filter(*cloud_voxels);
 
+    typename pcl::PointCloud<PointT>::Ptr cloud_cropped (new pcl::PointCloud<PointT>);
+
+    pcl::CropBox<PointT> crop(true);
+    crop.setMin(minPoint);
+    crop.setMax(maxPoint);
+    crop.setInputCloud(cloud_voxels);
+    crop.filter(*cloud_cropped);
+
+    std::vector<int> indices;
+
+    pcl::CropBox<PointT> roof(true);
+    roof.setMin(Eigen::Vector4f (-1.5, -1.7, -1, 1));
+    roof.setMax(Eigen::Vector4f (2.6, 1.7, -.4, 1));
+    roof.setInputCloud(cloud_cropped);
+    roof.filter(indices);
+
+    pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+
+    for (int point : indices)
+    {
+        inliers->indices.push_back(point);
+    }
+
+    pcl::ExtractIndices<PointT> ex;
+    ex.setInputCloud(cloud_cropped);
+    ex.setIndices(inliers);
+    ex.setNegative(true);
+    ex.filter(*cloud_cropped);
 
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
-    return cloud;
+    return cloud_cropped;
 
 }
 
@@ -53,7 +89,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
         cloud_plane->points.push_back(cloud->points[index]);
     }
 
-    pcl::ExtractIndices<pcl::PointXYZ> extract;
+    pcl::ExtractIndices<PointT> extract;
 
     extract.setInputCloud(cloud);
     extract.setIndices(inliers);
@@ -192,7 +228,6 @@ BoxQ ProcessPointClouds<PointT>::BoundingBoxQ(typename pcl::PointCloud<pcl::Poin
     
 
     eigenVecPCA.col(2) = eigenVecPCA.col(0).cross(eigenVecPCA.col(1));
-    std::cout << eigenVecPCA << std::endl;
 
     Eigen::Matrix4f projectionTransform(Eigen::Matrix4f::Identity());
     
