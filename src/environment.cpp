@@ -37,41 +37,41 @@ std::vector<Car> initHighway(bool renderScene, pcl::visualization::PCLVisualizer
 
 void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
-    // ----------------------------------------------------
-    // -----Open 3D viewer and display simple highway -----
-    // ----------------------------------------------------
+    // // ----------------------------------------------------
+    // // -----Open 3D viewer and display simple highway -----
+    // // ----------------------------------------------------
     
-    // RENDER OPTIONS
-    bool renderScene = false;
-    std::vector<Car> cars = initHighway(renderScene, viewer);
+    // // RENDER OPTIONS
+    // bool renderScene = false;
+    // std::vector<Car> cars = initHighway(renderScene, viewer);
     
-    // TODO:: Create lidar sensor
+    // // TODO:: Create lidar sensor
 
-    Lidar* theLidar (new Lidar(cars, 0));
+    // Lidar* theLidar (new Lidar(cars, 0));
 
-    // TODO:: Create point processor
-    pcl::PointCloud<pcl::PointXYZ>::Ptr inputCloud = theLidar->scan();
+    // // TODO:: Create point processor
+    // pcl::PointCloud<pcl::PointXYZ>::Ptr inputCloud = theLidar->scan();
     
-    ProcessPointClouds<pcl::PointXYZ>* pclProc (new ProcessPointClouds<pcl::PointXYZ>());
+    // ProcessPointClouds<pcl::PointXYZ>* pclProc (new ProcessPointClouds<pcl::PointXYZ>());
 
-    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segResult = pclProc->SegmentPlane(inputCloud, 100, 0.2);
-    // renderPointCloud(viewer, segResult.first, "obstacles", Color(1,0,0));
-    // renderPointCloud(viewer, segResult.second, "plane", Color(0,1,0));
+    // std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segResult = pclProc->SegmentPlane(inputCloud, 100, 0.2);
+    // // renderPointCloud(viewer, segResult.first, "obstacles", Color(1,0,0));
+    // // renderPointCloud(viewer, segResult.second, "plane", Color(0,1,0));
 
-    std::vector<typename pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pclProc->Clustering(segResult.first, 1.0, 3, 30);
+    // std::vector<typename pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pclProc->Clustering(segResult.first, 1.0, 3, 30);
 
-    int clusterId = 0;
-    std::vector<Color> colors = {Color(1,0,0), Color(0,1,0), Color(0,0,1)};
+    // int clusterId = 0;
+    // std::vector<Color> colors = {Color(1,0,0), Color(0,1,0), Color(0,0,1)};
 
-    for (pcl::PointCloud<pcl::PointXYZ>::Ptr cluster : cloudClusters)
-    {
-        std::cout << "cluster size:";
-        pclProc->numPoints(cluster);
-        renderPointCloud(viewer, cluster, "obstCloud"+std::to_string(clusterId), colors[clusterId % (int)colors.size()]);
-        BoxQ box = pclProc->BoundingBoxQ(cluster);
-        renderBox(viewer, box, clusterId, Color(1,0,0), 1.0);
-        ++clusterId;
-    }
+    // for (pcl::PointCloud<pcl::PointXYZ>::Ptr cluster : cloudClusters)
+    // {
+    //     std::cout << "cluster size:";
+    //     pclProc->numPoints(cluster);
+    //     renderPointCloud(viewer, cluster, "obstCloud"+std::to_string(clusterId), colors[clusterId % (int)colors.size()]);
+    //     BoxQ box = pclProc->BoundingBoxQ(cluster);
+    //     renderBox(viewer, box, clusterId, Color(1,0,0), 1.0);
+    //     ++clusterId;
+    // }
 }
 
 void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer, ProcessPointClouds<pcl::PointXYZI>* pclProc, const pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud)
@@ -148,7 +148,6 @@ int main (int argc, char** argv)
     std::vector<boost::filesystem::path> stream = pointProcesorI->streamPcd("../src/sensors/data/pcd/data_1");
     auto streamIt = stream.begin();
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloudI;
-    cityBlock(viewer, pointProcesorI, inputCloudI);
 
     while (!viewer->wasStopped ())
     {   
@@ -156,6 +155,7 @@ int main (int argc, char** argv)
         viewer->removeAllShapes();
 
         inputCloudI = pointProcesorI->loadPcd((*streamIt).string());
+        std::cout << inputCloudI << std::endl;
         cityBlock(viewer, pointProcesorI, inputCloudI);
 
         streamIt++;
